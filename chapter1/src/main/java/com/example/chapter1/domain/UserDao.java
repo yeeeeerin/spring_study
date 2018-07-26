@@ -2,12 +2,11 @@ package com.example.chapter1.domain;
 
 import java.sql.*;
 
-public class UserDao {
+public abstract class UserDao {
 
     public void add(User user) throws ClassNotFoundException,SQLException{
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection c = DriverManager.getConnection(
-                "jdbc:mysql://localhost/tobi","testuser","rmfo2154");
+
+        Connection c = getConnection();
 
         PreparedStatement ps = c.prepareStatement("insert into user(id,name,password) value (?,?,?)");
 
@@ -22,9 +21,8 @@ public class UserDao {
     }
 
     public User get(String id) throws ClassNotFoundException, SQLException{
-        Class.forName("com.mysql.jdbc.Driver");
-        Connection c = DriverManager.getConnection(
-                "jdbc:mysql://localhost/tobi","testuser","rmfo2154");
+
+        Connection c = getConnection();
 
         PreparedStatement ps = c.prepareStatement("select * from user where id = ?");
         ps.setString(1,id);
@@ -42,5 +40,8 @@ public class UserDao {
 
         return user;
     }
+
+    //관심사의 분리
+    public abstract Connection getConnection() throws ClassNotFoundException,SQLException;
 
 }
