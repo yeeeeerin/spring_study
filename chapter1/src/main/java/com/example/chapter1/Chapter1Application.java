@@ -1,12 +1,12 @@
 package com.example.chapter1;
 
 import com.example.chapter1.dao.DaoFactory;
-import com.example.chapter1.domain.ConnectionMaker;
-import com.example.chapter1.domain.MConnectionMaker;
 import com.example.chapter1.domain.User;
 import com.example.chapter1.domain.UserDao;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.SQLException;
 
@@ -17,7 +17,9 @@ public class Chapter1Application {
     public static void main(String[] args) throws  ClassNotFoundException,SQLException {
         SpringApplication.run(Chapter1Application.class, args);
 
-        UserDao dao = new DaoFactory().userDao();
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+
+        UserDao dao = context.getBean("userDao",UserDao.class);
 
         User user = new User();
         user.setId("yerin");
