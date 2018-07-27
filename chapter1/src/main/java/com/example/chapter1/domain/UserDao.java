@@ -2,13 +2,19 @@ package com.example.chapter1.domain;
 
 import java.sql.*;
 
-public abstract class UserDao {
+public class UserDao {
+
+    private ConnectionMaker connectionMaker;
+
+    public UserDao(ConnectionMaker connectionMaker){
+        this.connectionMaker = connectionMaker;
+    }
 
     public void add(User user) throws ClassNotFoundException,SQLException{
 
-        Connection c = getConnection();
+        Connection c = connectionMaker.makeConnection();
 
-        PreparedStatement ps = c.prepareStatement("insert into user(id,name,password) value (?,?,?)");
+        PreparedStatement ps = c.prepareStatement("insert into users(id,name,password) value (?,?,?)");
 
         ps.setString(1,user.getId());
         ps.setString(2,user.getName());
@@ -22,9 +28,9 @@ public abstract class UserDao {
 
     public User get(String id) throws ClassNotFoundException, SQLException{
 
-        Connection c = getConnection();
+        Connection c  = connectionMaker.makeConnection();
 
-        PreparedStatement ps = c.prepareStatement("select * from user where id = ?");
+        PreparedStatement ps = c.prepareStatement("select * from users where id = ?");
         ps.setString(1,id);
 
         ResultSet rs = ps.executeQuery();
@@ -41,7 +47,5 @@ public abstract class UserDao {
         return user;
     }
 
-    //관심사의 분리
-    public abstract Connection getConnection() throws ClassNotFoundException,SQLException;
 
 }

@@ -1,5 +1,7 @@
 package com.example.chapter1;
 
+import com.example.chapter1.domain.ConnectionMaker;
+import com.example.chapter1.domain.MConnectionMaker;
 import com.example.chapter1.domain.User;
 import com.example.chapter1.domain.UserDao;
 import org.springframework.boot.SpringApplication;
@@ -13,7 +15,9 @@ public class Chapter1Application {
     public static void main(String[] args) throws  ClassNotFoundException,SQLException {
         SpringApplication.run(Chapter1Application.class, args);
 
-        UserDao dao = new UserDao();
+        ConnectionMaker connectionMaker = new MConnectionMaker();
+
+        UserDao dao = new UserDao(connectionMaker);
 
         User user = new User();
         user.setId("yerin");
