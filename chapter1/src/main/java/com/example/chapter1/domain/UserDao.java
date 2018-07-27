@@ -2,7 +2,7 @@ package com.example.chapter1.domain;
 
 import java.sql.*;
 
-//test
+//test sourcetree
 public class UserDao {
 
     private ConnectionMaker connectionMaker;
