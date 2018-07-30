@@ -8,6 +8,9 @@ import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.Matchers.is;
@@ -26,22 +29,58 @@ public class Chapter1ApplicationTests {
         ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         UserDao userDao = context.getBean("userDao",UserDao.class);
 
-        User user = new User();
-        user.setId("yerin");
-        user.setName("이예린");
-        user.setPassword("q1w2e3r4");
+        User user1 = new User("aaa","aaa","aaa");
+        User user2 = new User("bbb","bbb","bbb");
 
-        userDao.add(user);
+        userDao.deleteAll();
+        assertThat(userDao.getCount(),is(0));
 
-        User user2 = userDao.get(user.getId());
+        userDao.add(user1);
+        userDao.add(user2);
 
-        assertThat(user2.getName(),is(user.getName()));
-        assertThat(user2.getPassword(),is(user.getPassword()));
+        assertThat(userDao.getCount(),is(2));
+
+        User userget1 = userDao.get(user1.getId());
+        assertThat(userget1.getName(),is(user1.getName()));
+        assertThat(userget1.getPassword(),is(user1.getPassword()));
+
+        User userget2 = userDao.get(user2.getId());
+        assertThat(userget2.getName(),is(user2.getName()));
+        assertThat(userget2.getPassword(),is(user2.getPassword()));
 
     }
 
     @Test
-    public void contextLoads() {
+    public void count() throws SQLException, ClassNotFoundException {
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+
+        UserDao userDao = context.getBean("userDao",UserDao.class);
+        User user1 = new User("aaa","aaa","aaa");
+        User user2 = new User("bbb","bbb","bbb");
+        User user3 = new User("ccc","ccc","ccc");
+
+        userDao.deleteAll();
+        assertThat(userDao.getCount(),is(0));
+
+        userDao.add(user1);
+        assertThat(userDao.getCount(),is(1));
+
+        userDao.add(user2);
+        assertThat(userDao.getCount(),is(2));
+
+        userDao.add(user3);
+        assertThat(userDao.getCount(),is(3));
+    }
+
+    @Test(expected = EmptyResultDataAccessException.class)
+    public void getUserFailure() throws SQLException, ClassNotFoundException {
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+
+        UserDao dao = context.getBean("userDao",UserDao.class);
+        dao.deleteAll();
+        assertThat(dao.getCount(),is(0));
+
+        dao.get("unknown_id");
     }
 
 }
