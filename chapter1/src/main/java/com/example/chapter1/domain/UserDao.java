@@ -12,6 +12,7 @@ public class UserDao {
     private DataSource dataSource;
 
 
+
     public void add(User user) throws ClassNotFoundException,SQLException{
 
         Connection c = dataSource.getConnection();
