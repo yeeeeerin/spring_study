@@ -3,15 +3,14 @@ package com.example.chapter1;
 import com.example.chapter1.dao.DaoFactory;
 import com.example.chapter1.domain.User;
 import com.example.chapter1.domain.UserDao;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.Matchers.is;
@@ -22,32 +21,16 @@ import java.sql.SQLException;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@ContextConfiguration(classes = DaoFactory.class) //테스트 컨텍스트를 자동으로 만들어줌
 public class Chapter1ApplicationTests {
-
-    @Autowired
-    private ApplicationContext context;//테스트 오브젝트가 만들어지고 나면 스프링 테스트 컨텍스트의 의해 자동으로 값이 주입된다.
-
-    @Autowired
-    private UserDao userDao;
-    
-    private User user1;
-    private User user2;
-    private User user3;
-
-
-    @Before
-    public void setUp(){
-        this.userDao = context.getBean("userDao",UserDao.class);
-
-        this.user1 = new User("aaa","aaa","aaa");
-        this.user2 = new User("bbb","bbb","bbb");
-        this.user3 = new User("ccc","ccc","ccc");
-    }
 
     @Test
     public void addAndGet() throws SQLException, ClassNotFoundException {
 
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
+        UserDao userDao = context.getBean("userDao",UserDao.class);
+
+        User user1 = new User("aaa","aaa","aaa");
+        User user2 = new User("bbb","bbb","bbb");
 
         userDao.deleteAll();
         assertThat(userDao.getCount(),is(0));
@@ -69,7 +52,12 @@ public class Chapter1ApplicationTests {
 
     @Test
     public void count() throws SQLException, ClassNotFoundException {
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
 
+        UserDao userDao = context.getBean("userDao",UserDao.class);
+        User user1 = new User("aaa","aaa","aaa");
+        User user2 = new User("bbb","bbb","bbb");
+        User user3 = new User("ccc","ccc","ccc");
 
         userDao.deleteAll();
         assertThat(userDao.getCount(),is(0));
@@ -86,11 +74,13 @@ public class Chapter1ApplicationTests {
 
     @Test(expected = EmptyResultDataAccessException.class)
     public void getUserFailure() throws SQLException, ClassNotFoundException {
+        ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
 
-        userDao.deleteAll();
-        assertThat(userDao.getCount(),is(0));
+        UserDao dao = context.getBean("userDao",UserDao.class);
+        dao.deleteAll();
+        assertThat(dao.getCount(),is(0));
 
-        userDao.get("unknown_id");
+        dao.get("unknown_id");
     }
 
 }
