@@ -1,7 +1,5 @@
 package com.example.chapter1.domain;
 
-import com.example.chapter1.dao.AddStatement;
-import com.example.chapter1.dao.DeleteAllStatement;
 import com.example.chapter1.dao.StatementStrategy;
 import lombok.Setter;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -15,10 +13,22 @@ public class UserDao {
     private DataSource dataSource;
 
 
-    public void add(User user) throws ClassNotFoundException,SQLException{
+    public void add(final User user) throws ClassNotFoundException,SQLException{
 
-        StatementStrategy st = new AddStatement(user);
-        jdbcContextWithStatementStrategy(st);
+        //익명내부 클래스 적용
+        jdbcContextWithStatementStrategy(
+                new StatementStrategy() {
+                    @Override
+                    public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                        PreparedStatement ps = c.prepareStatement("insert into users(id,name,password) value (?,?,?)");
+
+                        ps.setString(1,user.getId());
+                        ps.setString(2,user.getName());
+                        ps.setString(3,user.getPassword());
+
+                        return ps;
+                    }
+                });
     }
 
     public User get(String id) throws ClassNotFoundException, SQLException{
@@ -49,8 +59,15 @@ public class UserDao {
 
     public void deleteAll() throws SQLException{
 
-        StatementStrategy st = new DeleteAllStatement();
-        jdbcContextWithStatementStrategy(st);
+        //익명내부클래스 적용
+        jdbcContextWithStatementStrategy(
+                new StatementStrategy() {
+                    @Override
+                    public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                        return c.prepareStatement("delete from users");
+                    }
+                }
+        );
 
     }
 
