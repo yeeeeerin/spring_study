@@ -14,6 +14,8 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.sameInstance;
 import static org.junit.Assert.assertThat;
 
 import java.sql.SQLException;
@@ -23,9 +25,10 @@ import java.sql.SQLException;
 @SpringBootTest
 public class Chapter1ApplicationTests {
 
+
+
     @Test
     public void addAndGet() throws SQLException, ClassNotFoundException {
-
         ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         UserDao userDao = context.getBean("userDao",UserDao.class);
 
