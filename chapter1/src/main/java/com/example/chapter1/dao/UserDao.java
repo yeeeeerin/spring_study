@@ -28,6 +28,7 @@ public class UserDao {
                 new StatementStrategy() {
                     @Override
                     public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+
                         PreparedStatement ps = c.prepareStatement("insert into users(id,name,password) value (?,?,?)");
 
                         ps.setString(1,user.getId());
@@ -66,18 +67,9 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException{
-
-        //익명내부클래스 적용
-        this.jdbcContext.workWithStatementStratege(
-                new StatementStrategy() {
-                    @Override
-                    public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-                        return c.prepareStatement("delete from users");
-                    }
-                }
-        );
-
+        this.jdbcContext.executeSql("delete from users");
     }
+
 
     public int getCount() throws SQLException {
         Connection c = null;

@@ -31,4 +31,16 @@ public class JdbcContext {
             if (c != null){ try { c.close(); } catch (SQLException e){ } };
         }
     }
+
+    public void executeSql(final String query) throws SQLException{
+        //익명내부클래스 적용
+        workWithStatementStratege(
+                new StatementStrategy() {
+                    @Override
+                    public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
+                        return c.prepareStatement(query);
+                    }
+                }
+        );
+    }
 }
