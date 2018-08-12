@@ -2,7 +2,7 @@ package com.example.chapter1;
 
 import com.example.chapter1.dao.DaoFactory;
 import com.example.chapter1.domain.User;
-import com.example.chapter1.domain.UserDao;
+import com.example.chapter1.dao.UserDao;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;

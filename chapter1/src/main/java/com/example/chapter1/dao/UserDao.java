@@ -1,6 +1,7 @@
-package com.example.chapter1.domain;
+package com.example.chapter1.dao;
 
 import com.example.chapter1.dao.StatementStrategy;
+import com.example.chapter1.domain.User;
 import lombok.Setter;
 import org.springframework.dao.EmptyResultDataAccessException;
 
@@ -12,11 +13,18 @@ public class UserDao {
     @Setter
     private DataSource dataSource;
 
+    private JdbcContext jdbcContext;
 
+
+    public void setDataSource(DataSource dataSource){
+        this.jdbcContext = new JdbcContext(); //Jdbccontext생성
+        this.jdbcContext.setDataSource(dataSource); //의존 오브젝트 주임
+        this.dataSource=dataSource;//아직 jdbccontext를 적용하지 않은 메소드를 위해 저장해둔다,
+    }
     public void add(final User user) throws ClassNotFoundException,SQLException{
 
         //익명내부 클래스 적용
-        jdbcContextWithStatementStrategy(
+        this.jdbcContext.workWithStatementStratege(
                 new StatementStrategy() {
                     @Override
                     public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
@@ -60,7 +68,7 @@ public class UserDao {
     public void deleteAll() throws SQLException{
 
         //익명내부클래스 적용
-        jdbcContextWithStatementStrategy(
+        this.jdbcContext.workWithStatementStratege(
                 new StatementStrategy() {
                     @Override
                     public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
@@ -111,21 +119,5 @@ public class UserDao {
         }
 
     }
-    public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws SQLException{
-        Connection c = null;
-        PreparedStatement ps = null;
 
-        try {
-            c = dataSource.getConnection();
-
-            ps = stmt.makePreparedStatement(c);
-
-            ps.executeUpdate();
-        }catch (SQLException e){
-            throw e;
-        }finally {
-            if (ps != null){ try { ps.close(); } catch (SQLException e){ } };
-            if (c != null){ try { c.close(); } catch (SQLException e){ } };
-        }
-    }
 }
