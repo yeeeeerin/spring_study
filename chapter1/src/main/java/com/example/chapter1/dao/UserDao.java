@@ -4,6 +4,8 @@ import com.example.chapter1.dao.StatementStrategy;
 import com.example.chapter1.domain.User;
 import lombok.Setter;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -13,31 +15,16 @@ public class UserDao {
     @Setter
     private DataSource dataSource;
 
-    private JdbcContext jdbcContext;
+    private JdbcTemplate jdbcTemplate;
 
 
     public void setDataSource(DataSource dataSource){
-        this.jdbcContext = new JdbcContext(); //Jdbccontext생성
-        this.jdbcContext.setDataSource(dataSource); //의존 오브젝트 주임
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.dataSource=dataSource;//아직 jdbccontext를 적용하지 않은 메소드를 위해 저장해둔다,
     }
     public void add(final User user) throws ClassNotFoundException,SQLException{
-
-        //익명내부 클래스 적용
-        this.jdbcContext.workWithStatementStratege(
-                new StatementStrategy() {
-                    @Override
-                    public PreparedStatement makePreparedStatement(Connection c) throws SQLException {
-
-                        PreparedStatement ps = c.prepareStatement("insert into users(id,name,password) value (?,?,?)");
-
-                        ps.setString(1,user.getId());
-                        ps.setString(2,user.getName());
-                        ps.setString(3,user.getPassword());
-
-                        return ps;
-                    }
-                });
+        this.jdbcTemplate.update("insert into users(id,name,password) value(?,?,?)",
+                user.getId(),user.getName(),user.getPassword());
     }
 
     public User get(String id) throws ClassNotFoundException, SQLException{
@@ -67,7 +54,7 @@ public class UserDao {
     }
 
     public void deleteAll() throws SQLException{
-        this.jdbcContext.executeSql("delete from users");
+        this.jdbcTemplate.update("delete from users");
     }
 
 
