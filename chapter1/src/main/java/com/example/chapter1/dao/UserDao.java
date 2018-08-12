@@ -17,15 +17,25 @@ import java.util.List;
 
 //test sourcetree2222
 public class UserDao {
-    @Setter
-    private DataSource dataSource;
 
     private JdbcTemplate jdbcTemplate;
+
+    //get(),getall() 함수 안에 있던 중복 제거
+    private RowMapper<User> userMapper =
+            new RowMapper<User>() {
+                @Override
+                public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+                    User user = new User();
+                    user.setId(rs.getString("id"));
+                    user.setName(rs.getString("name"));
+                    user.setPassword(rs.getString("password"));
+                    return user;
+                }
+            };
 
 
     public void setDataSource(DataSource dataSource){
         this.jdbcTemplate = new JdbcTemplate(dataSource);
-        this.dataSource=dataSource;//아직 jdbccontext를 적용하지 않은 메소드를 위해 저장해둔다,
     }
     public void add(final User user) throws ClassNotFoundException,SQLException{
         this.jdbcTemplate.update("insert into users(id,name,password) value(?,?,?)",
@@ -34,17 +44,7 @@ public class UserDao {
 
     public User get(String id) {
         return this.jdbcTemplate.queryForObject("select * from users where id = ?",
-                new Object[]{id},
-                new RowMapper<User>() {
-                    @Override
-                    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        User user = new User();
-                        user.setId(rs.getString("id"));
-                        user.setName(rs.getString("name"));
-                        user.setPassword(rs.getString("password"));
-                        return user;
-                    }
-                });
+                new Object[]{id}, this.userMapper);
     }
 
     public void deleteAll() throws SQLException{
@@ -75,17 +75,7 @@ public class UserDao {
 
     public List<User> getAll() {
 
-        return this.jdbcTemplate.query("select * from users order by id",
-                new RowMapper<User>() {
-                    @Override
-                    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        User user = new User();
-                        user.setId(rs.getString("id"));
-                        user.setName(rs.getString("name"));
-                        user.setPassword(rs.getString("password"));
-                        return user;
-                    }
-                });
+        return this.jdbcTemplate.query("select * from users order by id", this.userMapper);
 
     }
 }
