@@ -1,19 +1,17 @@
 package com.example.chapter1.dao;
 
-import com.example.chapter1.dao.StatementStrategy;
+
 import com.example.chapter1.domain.User;
-import lombok.Setter;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
+import com.example.chapter1.exception.DuplicateUserIdException;
+import com.mysql.jdbc.MysqlErrorNumbers;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 
-import javax.jws.soap.SOAPBinding;
 import javax.sql.DataSource;
-import java.sql.*;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
+
 
 //test sourcetree2222
 public class UserDao {
@@ -37,9 +35,21 @@ public class UserDao {
     public void setDataSource(DataSource dataSource){
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
-    public void add(final User user) throws ClassNotFoundException,SQLException{
-        this.jdbcTemplate.update("insert into users(id,name,password) value(?,?,?)",
-                user.getId(),user.getName(),user.getPassword());
+
+    public void add(final User user) throws DuplicateUserIdException {
+
+        try {
+            this.jdbcTemplate.update("insert into users(id,name,password) value(?,?,?)",
+                    user.getId(),user.getName(),user.getPassword());
+        }catch (SQLException e){
+            if (e.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY)
+                throw new DuplicateUserIdException(e); //예외전환
+            else
+                throw new RuntimeException(e);
+        }
+
+
+
     }
 
     public User get(String id) {
