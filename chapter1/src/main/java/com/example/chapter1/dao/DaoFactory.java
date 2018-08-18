@@ -2,6 +2,7 @@ package com.example.chapter1.dao;
 
 import com.example.chapter1.domain.ConnectionMaker;
 import com.example.chapter1.domain.MConnectionMaker;
+import com.example.chapter1.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
@@ -17,6 +18,13 @@ public class DaoFactory {
         UserDaoJdbc userDao = new UserDaoJdbc();
         userDao.setDataSource(dataSource());
         return userDao;
+    }
+
+    @Bean
+    public UserService userService(){
+        UserService userService = new UserService();
+        userService.setUserDao(userDao());
+        return userService;
     }
 
 

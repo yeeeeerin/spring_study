@@ -1,5 +1,6 @@
 package com.example.chapter1.dao;
 
+import com.example.chapter1.domain.Level;
 import com.example.chapter1.domain.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -21,6 +22,9 @@ public class UserDaoJdbc implements UserDao {
                     user.setId(rs.getString("id"));
                     user.setName(rs.getString("name"));
                     user.setPassword(rs.getString("password"));
+                    user.setLevel(Level.valueOf(rs.getInt("level")));
+                    user.setLogin(rs.getInt("login"));
+                    user.setRecommend(rs.getInt("recommend"));
                     return user;
                 }
             };
@@ -31,8 +35,9 @@ public class UserDaoJdbc implements UserDao {
     }
 
     public void add(final User user)  {
-        this.jdbcTemplate.update("insert into users(id,name,password) value(?,?,?)",
-                user.getId(),user.getName(),user.getPassword());
+        this.jdbcTemplate.update("insert into users(id,name,password,level,login,recommend) value(?,?,?,?,?,?)",
+                user.getId(),user.getName(),user.getPassword()
+                ,user.getLevel().intValue(),user.getLogin(),user.getRecommend());
 
 
     }
@@ -66,6 +71,15 @@ public class UserDaoJdbc implements UserDao {
          */
 
         return this.jdbcTemplate.queryForObject("select count(*) from users",int.class);
+    }
+
+    @Override
+    public void update(User user) {
+        this.jdbcTemplate.update(
+                "update users set name = ?, password = ?, level = ?, login = ?, recommend = ? where id = ?",
+                user.getName(),user.getPassword(),user.getLevel().intValue()
+                ,user.getLogin(),user.getRecommend(),user.getId()
+        );
     }
 
     public List<User> getAll() {
