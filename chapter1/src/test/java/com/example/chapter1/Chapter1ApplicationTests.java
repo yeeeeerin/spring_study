@@ -6,16 +6,21 @@ import com.example.chapter1.dao.UserDao;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.support.SQLErrorCodeSQLExceptionTranslator;
+import org.springframework.jdbc.support.SQLExceptionTranslator;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.jws.soap.SOAPBinding;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
+import javax.sql.DataSource;
+
+
+import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 import java.sql.SQLException;
@@ -26,10 +31,14 @@ import java.util.List;
 @SpringBootTest
 public class Chapter1ApplicationTests {
 
-    private UserDao dao;
+    @Autowired UserDao dao;
+    @Autowired DataSource dataSource;
+
     private User user1;
     private User user2;
     private User user3;
+
+
 
     @Before
     public void setUp(){
@@ -120,4 +129,18 @@ public class Chapter1ApplicationTests {
         assertThat(user1.getPassword(),is(user2.getPassword()));
     }
 
+
+    /*
+    중복된 키를 가진 정보를 등록햇을 때
+    DataAccessException의 DuplicateKeyException이 난다.
+    */
+    @Test(expected = DuplicateKeyException.class)
+    public void duplicateKey(){
+        dao.deleteAll();
+
+        dao.add(user1);
+        dao.add(user1);
+    }
+
+    
 }
