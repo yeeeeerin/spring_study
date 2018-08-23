@@ -15,6 +15,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.example.chapter1.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
+import static com.example.chapter1.service.UserService.MIN_RECCOMEND_FOR_GOLD;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -34,11 +36,11 @@ public class UserServiceTest {
     @Before
     public void serUp(){
         users = Arrays.asList(
-                new User("aaa","aaa","aaa", Level.BASIC,49,0),
-                new User("bbb","bbb","bbb", Level.BASIC,50,0),
-                new User("ccc","ccc","ccc", Level.SILVER,60,29),
-                new User("ddd","ddd","ddd", Level.SILVER,60,30),
-                new User("eee","eee","eee", Level.GOLD,100,100)
+                new User("aaa","aaa","aaa", Level.BASIC,MIN_LOGCOUNT_FOR_SILVER-1,0),
+                new User("bbb","bbb","bbb", Level.BASIC,MIN_LOGCOUNT_FOR_SILVER,0),
+                new User("ccc","ccc","ccc", Level.SILVER,60,MIN_RECCOMEND_FOR_GOLD-1),
+                new User("ddd","ddd","ddd", Level.SILVER,60,MIN_RECCOMEND_FOR_GOLD),
+                new User("eee","eee","eee", Level.GOLD,100,Integer.MAX_VALUE)
         );
     }
 
@@ -67,19 +69,23 @@ public class UserServiceTest {
 
         userService.upgradeLevels();
 
-        checkLevel(users.get(0),Level.BASIC);
-        checkLevel(users.get(1),Level.SILVER);
-        checkLevel(users.get(2),Level.SILVER);
-        checkLevel(users.get(3),Level.GOLD);
-        checkLevel(users.get(4),Level.GOLD);
+        checkLevelUpgraded(users.get(0),false);
+        checkLevelUpgraded(users.get(1),true);
+        checkLevelUpgraded(users.get(2),false);
+        checkLevelUpgraded(users.get(3),true);
+        checkLevelUpgraded(users.get(4),false);
 
     }
-
-    private void checkLevel(User user,Level expectedLevel){
+    private void checkLevelUpgraded(User user, boolean upgraded){
         User userUpdate = dao.get(user.getId());
-        assertThat(userUpdate.getLevel(),is(expectedLevel));
+        if (upgraded){
+            assertThat(userUpdate.getLevel(),is(user.getLevel().nextLevel()));
+            //업그레이드가 일어났는지 확인
+        }
+        else {
+            assertThat(userUpdate.getLevel(), is(user.getLevel()));
+            //업그레이드가 일어나지 않았는지 확인
+        }
     }
-
-
 
 }
