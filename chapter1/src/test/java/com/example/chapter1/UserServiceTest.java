@@ -11,13 +11,17 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.PlatformTransactionManager;
 
+import javax.sql.DataSource;
+import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
 import static com.example.chapter1.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
 import static com.example.chapter1.service.UserService.MIN_RECCOMEND_FOR_GOLD;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.theInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -30,6 +34,10 @@ public class UserServiceTest {
     UserService userService;
     @Autowired
     UserDao dao;
+    @Autowired
+    DataSource dataSource;
+    @Autowired
+    PlatformTransactionManager transactionManager;
 
     List<User> users;
 
@@ -63,7 +71,29 @@ public class UserServiceTest {
     }
 
     @Test
-    public void upgradeLevels(){
+    public void upgradeAllOrNothing() throws SQLException {
+        UserService testUserService = new TestUserService(users.get(3).getId());
+        testUserService.setUserDao(this.dao);
+        testUserService.setTransactionManager(transactionManager);
+
+        dao.deleteAll();
+        for(User user:users) dao.add(user);
+
+        try {
+            testUserService.upgradeLevels();
+            fail("TestUserServiceException expected");
+        }catch (TestUserServiceException e){
+
+        }
+
+        checkLevelUpgraded(users.get(1),false);
+
+
+    }
+
+    @Test
+    public void upgradeLevels() throws SQLException {
+
         dao.deleteAll();
         for (User user:users) dao.add(user);
 
@@ -88,4 +118,30 @@ public class UserServiceTest {
         }
     }
 
+    static class TestUserService extends UserService{
+        private String id;
+
+        /*
+        예외를 발생시킬 User 오브젝트의 id를 지정할 수 있게 만든다.
+         */
+        private TestUserService(String id){
+            this.id = id;
+        }
+
+        /*
+        지정된 id의 User 오브젝트가 발견되면 예외를 던져서 작업을 강제로 중단시킨다.
+         */
+        protected void upgradeLevel(User user){
+            //지정된 id가 발견되면 예외를 던진다.
+            if (user.getId().equals(this.id)) throw new TestUserServiceException();
+            super.upgradeLevel(user);
+        }
+    }
+
+    static class TestUserServiceException extends RuntimeException{
+
+    }
+
 }
+
+

@@ -5,9 +5,11 @@ import com.example.chapter1.domain.MConnectionMaker;
 import com.example.chapter1.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 
 import javax.sql.DataSource;
+import javax.transaction.TransactionManager;
 
 @Configuration //애플리케이션 컨텍스트 또는 빈 팩토리가 사용할 설정정보라는 표시
 public class DaoFactory {
@@ -23,9 +25,16 @@ public class DaoFactory {
     @Bean
     public UserService userService(){
         UserService userService = new UserService();
-
+        userService.setTransactionManager(transactionManager());
         userService.setUserDao(userDao());
         return userService;
+    }
+
+    @Bean
+    public DataSourceTransactionManager transactionManager(){
+        DataSourceTransactionManager dataSourceTransactionManager = new DataSourceTransactionManager();
+        dataSourceTransactionManager.setDataSource(dataSource());
+        return dataSourceTransactionManager;
     }
 
 
