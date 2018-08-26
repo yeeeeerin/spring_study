@@ -44,11 +44,11 @@ public class UserServiceTest {
     @Before
     public void serUp(){
         users = Arrays.asList(
-                new User("aaa","aaa","aaa", Level.BASIC,MIN_LOGCOUNT_FOR_SILVER-1,0),
-                new User("bbb","bbb","bbb", Level.BASIC,MIN_LOGCOUNT_FOR_SILVER,0),
-                new User("ccc","ccc","ccc", Level.SILVER,60,MIN_RECCOMEND_FOR_GOLD-1),
-                new User("ddd","ddd","ddd", Level.SILVER,60,MIN_RECCOMEND_FOR_GOLD),
-                new User("eee","eee","eee", Level.GOLD,100,Integer.MAX_VALUE)
+                new User("aaa","aaa","aaa", Level.BASIC,MIN_LOGCOUNT_FOR_SILVER-1,0,"aa@aa.aa"),
+                new User("bbb","bbb","bbb", Level.BASIC,MIN_LOGCOUNT_FOR_SILVER,0,"bb@bb.bb"),
+                new User("ccc","ccc","ccc", Level.SILVER,60,MIN_RECCOMEND_FOR_GOLD-1,"cc@cc.cc"),
+                new User("ddd","ddd","ddd", Level.SILVER,60,MIN_RECCOMEND_FOR_GOLD,"dd@dd.dd"),
+                new User("eee","eee","eee", Level.GOLD,100,Integer.MAX_VALUE,"ff@ff.ff")
         );
     }
 

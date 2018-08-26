@@ -25,6 +25,7 @@ public class UserDaoJdbc implements UserDao {
                     user.setLevel(Level.valueOf(rs.getInt("level")));
                     user.setLogin(rs.getInt("login"));
                     user.setRecommend(rs.getInt("recommend"));
+                    user.setEmail(rs.getString("email"));
                     return user;
                 }
             };
@@ -35,9 +36,9 @@ public class UserDaoJdbc implements UserDao {
     }
 
     public void add(final User user)  {
-        this.jdbcTemplate.update("insert into users(id,name,password,level,login,recommend) value(?,?,?,?,?,?)",
+        this.jdbcTemplate.update("insert into users(id,name,password,level,login,recommend,email) value(?,?,?,?,?,?,?)",
                 user.getId(),user.getName(),user.getPassword()
-                ,user.getLevel().intValue(),user.getLogin(),user.getRecommend());
+                ,user.getLevel().intValue(),user.getLogin(),user.getRecommend(),user.getEmail());
 
 
     }
@@ -53,32 +54,15 @@ public class UserDaoJdbc implements UserDao {
 
 
     public int getCount()  {
-
-        //다시 한번 뜯어보기!!!!
-        /*
-      return this.jdbcTemplate.query(new PreparedStatementCreator() { //statement 생성
-            @Override
-            public PreparedStatement createPreparedStatement(Connection con) throws SQLException {
-                return con.prepareStatement("select count(*) from users");
-            }
-        }, new ResultSetExtractor<Integer>() { //ResultSet으로부터 값 추출
-            @Override
-            public Integer extractData(ResultSet rs) throws SQLException, DataAccessException {
-                rs.next();
-                return rs.getInt(1);
-            }
-        });
-         */
-
         return this.jdbcTemplate.queryForObject("select count(*) from users",int.class);
     }
 
     @Override
     public void update(User user) {
         this.jdbcTemplate.update(
-                "update users set name = ?, password = ?, level = ?, login = ?, recommend = ? where id = ?",
+                "update users set name = ?, password = ?, level = ?, login = ?, recommend = ?, email = ? where id = ?",
                 user.getName(),user.getPassword(),user.getLevel().intValue()
-                ,user.getLogin(),user.getRecommend(),user.getId()
+                ,user.getLogin(),user.getRecommend(),user.getEmail(),user.getId()
         );
     }
 

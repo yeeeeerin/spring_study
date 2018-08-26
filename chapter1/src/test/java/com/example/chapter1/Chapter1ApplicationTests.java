@@ -45,9 +45,9 @@ public class Chapter1ApplicationTests {
     public void setUp(){
         ApplicationContext context = new AnnotationConfigApplicationContext(DaoFactory.class);
         this.dao = context.getBean("userDao",UserDao.class);
-        this.user1 = new User("aaa","aaa","aaa", Level.BASIC,1,0);
-        this.user2 = new User("bbb","bbb","bbb",Level.SILVER,55,10);
-        this.user3 = new User("ccc","ccc","ccc",Level.GOLD,100,40);
+        this.user1 = new User("aaa","aaa","aaa", Level.BASIC,1,0,"aa@aa.aa");
+        this.user2 = new User("bbb","bbb","bbb",Level.SILVER,55,10,"bb@bb.bb");
+        this.user3 = new User("ccc","ccc","ccc",Level.GOLD,100,40,"cc@cc.cc");
     }
 
     @Test
@@ -129,6 +129,7 @@ public class Chapter1ApplicationTests {
         assertThat(user1.getLevel(),is(user2.getLevel()));
         assertThat(user1.getLogin(),is(user2.getLogin()));
         assertThat(user1.getRecommend(),is(user2.getRecommend()));
+        assertThat(user1.getEmail(),is(user2.getEmail()));
     }
 
 
