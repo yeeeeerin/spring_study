@@ -5,22 +5,16 @@ import com.example.chapter1.domain.Level;
 import com.example.chapter1.domain.User;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.AddressException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Properties;
 
 @Getter
 @Setter
@@ -30,6 +24,13 @@ public class UserService {
     public static final int MIN_RECCOMEND_FOR_GOLD = 30;
 
     UserDao userDao;
+
+    private MailSender mailSender;
+
+    public void setMailSender(MailSender mailSender){
+        this.mailSender = mailSender;
+        System.out.println("mail : "+mailSender);
+    }
 
     private PlatformTransactionManager transactionManager;
 
@@ -45,7 +46,7 @@ public class UserService {
         try {
             List<User> users = userDao.getAll();
             for (User user:users){
-                Boolean change = null; // 레벨변화가 있는지 확인하는 변수
+
                 if(canUpgradeLevel(user)){
                     upgradeLevel(user);
                 }
@@ -70,26 +71,15 @@ public class UserService {
      */
     private void sendUpgradeEmail(User user){
 
-        Properties properties = new Properties();
-        properties.put("mail.smtp.host","mail.lyr.org");
-        Session s = Session.getInstance(properties,null);
 
-        MimeMessage message = new MimeMessage(s);
+        //MailMessage 인터페이스의 구현 클래스 오브젝트를 만들어 메일 내용을 작성한다.
+        SimpleMailMessage mailMessage = new SimpleMailMessage();
+        mailMessage.setTo(user.getEmail());
+        mailMessage.setFrom("useradmin@lyl.org");
+        mailMessage.setSubject("Upgrade 안내");
+        mailMessage.setText("사용자님의 등급이" + user.getLevel().name());
 
-        try {
-            message.setFrom(new InternetAddress("useradmin@lyl.org"));
-            message.addRecipient(Message.RecipientType.TO,
-                    new InternetAddress(user.getEmail()));
-            message.setSubject("Upgrade 안내");
-            message.setText("사용자님의 등급이" + user.getLevel().name() + "로 업그레이드 되었습니다");
-
-            Transport.send(message);
-
-        } catch (AddressException e) {
-            throw new RuntimeException(e);
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
+        this.mailSender.send(mailMessage);
 
     }
 

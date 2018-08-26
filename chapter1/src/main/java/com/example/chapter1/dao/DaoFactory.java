@@ -2,11 +2,14 @@ package com.example.chapter1.dao;
 
 import com.example.chapter1.domain.ConnectionMaker;
 import com.example.chapter1.domain.MConnectionMaker;
+import com.example.chapter1.service.DummyMailSender;
 import com.example.chapter1.service.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.mail.MailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
@@ -19,6 +22,7 @@ public class DaoFactory {
 
         UserDaoJdbc userDao = new UserDaoJdbc();
         userDao.setDataSource(dataSource());
+
         return userDao;
     }
 
@@ -27,6 +31,7 @@ public class DaoFactory {
         UserService userService = new UserService();
         userService.setTransactionManager(transactionManager());
         userService.setUserDao(userDao());
+        userService.setMailSender(mailSender());
         return userService;
     }
 
@@ -49,6 +54,20 @@ public class DaoFactory {
 
         return dataSource;
     }
+
+
+    @Bean
+    public MailSender mailSender(){
+        /*
+        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        javaMailSender.setHost("mail.server.com");
+        return javaMailSender;
+        */
+        MailSender mailSender = new DummyMailSender();
+
+        return mailSender;
+    }
+
 
     //분리하여 중복을 방지
     @Bean
