@@ -1,4 +1,4 @@
-package com.example.chapter1.service;
+package com.example.chapter1.mock;
 
 import org.springframework.mail.MailException;
 import org.springframework.mail.MailSender;
