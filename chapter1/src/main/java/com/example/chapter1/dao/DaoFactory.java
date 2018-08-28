@@ -4,6 +4,8 @@ import com.example.chapter1.domain.ConnectionMaker;
 import com.example.chapter1.domain.MConnectionMaker;
 import com.example.chapter1.service.DummyMailSender;
 import com.example.chapter1.service.UserService;
+import com.example.chapter1.service.UserServiceImpl;
+import com.example.chapter1.service.UserServiceTx;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -27,9 +29,16 @@ public class DaoFactory {
     }
 
     @Bean
-    public UserService userService(){
-        UserService userService = new UserService();
+    public UserServiceTx userService(){
+        UserServiceTx userService = new UserServiceTx();
         userService.setTransactionManager(transactionManager());
+        userService.setUserService(userServiceImpl());
+        return userService;
+    }
+
+    @Bean
+    public UserServiceImpl userServiceImpl(){
+        UserServiceImpl userService = new UserServiceImpl();
         userService.setUserDao(userDao());
         userService.setMailSender(mailSender());
         return userService;

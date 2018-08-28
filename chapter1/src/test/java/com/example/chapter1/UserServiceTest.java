@@ -6,6 +6,8 @@ import com.example.chapter1.domain.Level;
 import com.example.chapter1.domain.User;
 import com.example.chapter1.service.MockMailSender;
 import com.example.chapter1.service.UserService;
+import com.example.chapter1.service.UserServiceImpl;
+import com.example.chapter1.service.UserServiceTx;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,8 +23,8 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.example.chapter1.service.UserService.MIN_LOGCOUNT_FOR_SILVER;
-import static com.example.chapter1.service.UserService.MIN_RECCOMEND_FOR_GOLD;
+import static com.example.chapter1.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
+import static com.example.chapter1.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.theInstance;
 import static org.hamcrest.core.Is.is;
@@ -43,6 +45,8 @@ public class UserServiceTest {
     PlatformTransactionManager transactionManager;
     @Autowired
     MailSender mailSender;
+    @Autowired
+    UserServiceImpl userServiceImpl;
 
     List<User> users;
 
@@ -77,16 +81,20 @@ public class UserServiceTest {
 
     @Test
     public void upgradeAllOrNothing() throws SQLException {
-        UserService testUserService = new TestUserService(users.get(3).getId());
+        TestUserService testUserService = new TestUserService(users.get(3).getId());
         testUserService.setUserDao(this.dao);
-        testUserService.setTransactionManager(transactionManager);
         testUserService.setMailSender(mailSender);
+
+        UserServiceTx userServiceTx = new UserServiceTx();
+        userServiceTx.setTransactionManager(transactionManager);
+        userServiceTx.setUserService(testUserService);
 
         dao.deleteAll();
         for(User user:users) dao.add(user);
 
         try {
-            testUserService.upgradeLevels();
+            //트랜잭션 기능을 분리한 오브젝트를 통해 예외 발생용 TestUserService가 호출되게 해야한다.
+            userServiceTx.upgradeLevels();
             fail("TestUserServiceException expected");
         }catch (TestUserServiceException e){
 
@@ -104,7 +112,7 @@ public class UserServiceTest {
         for (User user:users) dao.add(user);
 
         MockMailSender mockMailSender = new MockMailSender();
-        userService.setMailSender(mockMailSender);
+        userServiceImpl.setMailSender(mockMailSender);
 
         userService.upgradeLevels();
 
@@ -132,7 +140,7 @@ public class UserServiceTest {
         }
     }
 
-    static class TestUserService extends UserService{
+    static class TestUserService extends UserServiceImpl{
         private String id;
 
         /*
