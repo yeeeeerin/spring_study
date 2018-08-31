@@ -4,6 +4,7 @@ package com.example.chapter1;
 import com.example.chapter1.dao.UserDao;
 import com.example.chapter1.domain.Level;
 import com.example.chapter1.domain.User;
+import com.example.chapter1.handler.TransactionHandler;
 import com.example.chapter1.mock.MockMailSender;
 import com.example.chapter1.mock.MockUserDao;
 import com.example.chapter1.service.UserService;
@@ -20,8 +21,10 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
 
 import javax.sql.DataSource;
+import java.lang.reflect.Proxy;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -88,16 +91,23 @@ public class UserServiceTest {
         testUserService.setUserDao(this.dao);
         testUserService.setMailSender(mailSender);
 
-        UserServiceTx userServiceTx = new UserServiceTx();
-        userServiceTx.setTransactionManager(transactionManager);
-        userServiceTx.setUserService(testUserService);
+        TransactionHandler txHandler = new TransactionHandler();
+        txHandler.setTarget(testUserService);
+        txHandler.setTransactionManager(transactionManager);
+        txHandler.setPattern("upgradeLevels");
+
+        UserService txUserService = (UserService) Proxy.newProxyInstance(
+                getClass().getClassLoader(),
+                new Class[]{UserService.class},
+                txHandler
+        );
 
         dao.deleteAll();
         for(User user:users) dao.add(user);
 
         try {
             //트랜잭션 기능을 분리한 오브젝트를 통해 예외 발생용 TestUserService가 호출되게 해야한다.
-            userServiceTx.upgradeLevels();
+            txUserService.upgradeLevels();
             fail("TestUserServiceException expected");
         }catch (TestUserServiceException e){
 
