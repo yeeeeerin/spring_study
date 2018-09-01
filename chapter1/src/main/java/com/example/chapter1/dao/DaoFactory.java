@@ -3,18 +3,16 @@ package com.example.chapter1.dao;
 import com.example.chapter1.domain.ConnectionMaker;
 import com.example.chapter1.domain.MConnectionMaker;
 import com.example.chapter1.service.DummyMailSender;
+import com.example.chapter1.service.TxProxyFactoryBean;
 import com.example.chapter1.service.UserService;
 import com.example.chapter1.service.UserServiceImpl;
-import com.example.chapter1.service.UserServiceTx;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.mail.MailSender;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 import javax.sql.DataSource;
-import javax.transaction.TransactionManager;
 
 @Configuration //애플리케이션 컨텍스트 또는 빈 팩토리가 사용할 설정정보라는 표시
 public class DaoFactory {
@@ -29,10 +27,12 @@ public class DaoFactory {
     }
 
     @Bean
-    public UserServiceTx userService(){
-        UserServiceTx userService = new UserServiceTx();
+    public TxProxyFactoryBean userService(){
+        TxProxyFactoryBean userService = new TxProxyFactoryBean();
+        userService.setTarget(userServiceImpl());
         userService.setTransactionManager(transactionManager());
-        userService.setUserService(userServiceImpl());
+        userService.setPattern("upgradeLevels");
+        userService.setServiceInterface(UserService.class);
         return userService;
     }
 
