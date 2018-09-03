@@ -37,10 +37,6 @@ dependencies {
     compile ('javax.activation:activation')
     compile ('org.springframework:spring-context-support')
 
-    compile group: 'aopalliance', name: 'aopalliance', version: '1.0'
-    compile group: 'org.springframework', name: 'spring-aop', version: '2.5.6'
-
-
     testCompile('junit:junit:4.12')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     testCompile group: 'org.hamcrest', name: 'hamcrest-core', version: '1.3'

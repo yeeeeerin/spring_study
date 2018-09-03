@@ -2,10 +2,10 @@ package com.example.chapter1.dao;
 
 import com.example.chapter1.domain.ConnectionMaker;
 import com.example.chapter1.domain.MConnectionMaker;
-import com.example.chapter1.service.DummyMailSender;
-import com.example.chapter1.service.TxProxyFactoryBean;
-import com.example.chapter1.service.UserService;
-import com.example.chapter1.service.UserServiceImpl;
+import com.example.chapter1.service.*;
+import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
+import org.springframework.aop.support.NameMatchMethodPointcut;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -27,12 +27,10 @@ public class DaoFactory {
     }
 
     @Bean
-    public TxProxyFactoryBean userService(){
-        TxProxyFactoryBean userService = new TxProxyFactoryBean();
+    public ProxyFactoryBean userService(){
+        ProxyFactoryBean userService = new ProxyFactoryBean();
         userService.setTarget(userServiceImpl());
-        userService.setTransactionManager(transactionManager());
-        userService.setPattern("upgradeLevels");
-        userService.setServiceInterface(UserService.class);
+        userService.setInterceptorNames(new String[]{"transactionAdvisor"});
         return userService;
     }
 
@@ -77,6 +75,28 @@ public class DaoFactory {
         return mailSender;
     }
 
+    @Bean
+    public TransactionAdvice transactionAdvice(){
+        TransactionAdvice transactionAdvice = new TransactionAdvice();
+        transactionAdvice.setTransactionManager(transactionManager());
+        return transactionAdvice;
+    }
+
+
+    @Bean
+    public NameMatchMethodPointcut transactionPointcut(){
+        NameMatchMethodPointcut nameMatchMethodPointcut = new NameMatchMethodPointcut();
+        nameMatchMethodPointcut.setMappedName("upgrade*");
+        return nameMatchMethodPointcut;
+    }
+
+    @Bean
+    public DefaultPointcutAdvisor transactionAdvisor(){
+        DefaultPointcutAdvisor defaultPointcutAdvisor = new DefaultPointcutAdvisor();
+        defaultPointcutAdvisor.setAdvice(transactionAdvice());
+        defaultPointcutAdvisor.setPointcut(transactionPointcut());
+        return defaultPointcutAdvisor;
+    }
 
     //분리하여 중복을 방지
     @Bean
