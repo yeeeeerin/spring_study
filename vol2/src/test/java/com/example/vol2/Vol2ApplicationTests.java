@@ -1,5 +1,6 @@
 package com.example.vol2;
 
+import com.example.vol2.bean.AnnotatedHello;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowire;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.context.support.StaticApplicationContext;
@@ -114,5 +116,13 @@ public class Vol2ApplicationTests {
 
         hello.print();
         assertThat(printer.toString(),is("Hello Child"));
+    }
+
+    @Test
+    public void simpleBeanScanning(){
+        ApplicationContext ctx = new AnnotationConfigApplicationContext("com.example.vol2.bean");
+        AnnotatedHello hello = ctx.getBean("annotatedHello",AnnotatedHello.class);
+
+        assertThat(hello,is(notNullValue()));
     }
 }
