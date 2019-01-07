@@ -3,9 +3,15 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="hello" class="com.example.vol2.Hello">
+
+    <!--byType : Type에 의한 자동 와이어링 -->
+    <bean id="hello" class="com.example.vol2.Hello" autowire="byType">
         <property name="name" value="Child" />
-        <property name="printer" ref="printer" />
+        <!--property name="printer" ref="printer" /-->
     </bean>
+    <bean id="printer" class="com.example.vol2.StringPrinter">
+
+    </bean>
+
 
 </beans>

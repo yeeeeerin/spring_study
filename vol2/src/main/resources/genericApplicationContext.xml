@@ -3,10 +3,16 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <bean id="hello" class="com.example.vol2.Hello">
+    <!--bean id="hello" class="com.example.vol2.Hello">
+        <constructor-arg index="0" value="Spring" />
+        <constructor-arg index="1" ref="printer"/>
+
+    </bean-->
+
+    <bean id="hello" class="com.example.vol2.Hello" autowire="byType">
         <property name="name" value="Spring" />
-        <property name="printer" ref="printer" />
     </bean>
+
 
     <bean id="printer" class="com.example.vol2.StringPrinter" />
 
