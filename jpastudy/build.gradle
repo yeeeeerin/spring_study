@@ -25,13 +25,9 @@ repositories {
 
 
 dependencies {
-    implementation('org.springframework.boot:spring-boot-starter-data-jpa')
-    implementation('org.springframework.boot:spring-boot-starter-security')
-    implementation('org.springframework.boot:spring-boot-starter-web')
-    runtimeOnly('com.h2database:h2')
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile('org.springframework.boot:spring-boot-starter-web')
+    compile('com.h2database:h2')
     compileOnly('org.projectlombok:lombok')
     testImplementation('org.springframework.boot:spring-boot-starter-test')
-    testImplementation('org.springframework.security:spring-security-test')
-
-    compile group: 'org.hibernate', name: 'hibernate-core', version: '5.4.0.Final'
 }
