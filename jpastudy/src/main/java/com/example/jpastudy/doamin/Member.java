@@ -9,11 +9,16 @@ import java.util.Date;
 @Getter
 @Setter
 @Entity
-@Table(name = "MEMBER")
+//uniqueConstraints 유니크 제약 조건a
+@Table(name = "MEMBER", uniqueConstraints = {@UniqueConstraint(
+        name = "NAME_UNIQUE",
+        columnNames = {"NAME"}
+)})
 public class Member {
 
     @Id
-    @Column(name = "ID")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+                    generator = "MEMBER_SEQ_GENERATOR")
     private Long id;
 
     @Column(name = "NAME", nullable = false, length = 10)
