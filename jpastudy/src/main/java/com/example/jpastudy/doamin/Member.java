@@ -27,6 +27,21 @@ public class Member {
     @Column(name = "AGE")
     private Integer age;
 
+    @ManyToOne
+    @JoinColumn(name = "TEAM_ID")
+    private Team team;
+
+
+    public void setTeam(Team team) {
+
+        if (this.team != null){
+            this.team.getMembers().remove(this);
+        }
+
+        this.team = team;
+        team.getMembers().add(this); //연관관계를 위해
+    }
+
 
     @Enumerated(EnumType.STRING)
     private RoleType roleType;
