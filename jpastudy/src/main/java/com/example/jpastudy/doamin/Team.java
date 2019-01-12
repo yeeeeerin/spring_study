@@ -13,7 +13,8 @@ public class Team {
 
     @Id
     @Column(name = "TEAM_ID")
-    //@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "TEAM_SEQ_GENERATOR")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,
+            generator = "TEAM_SEQ_GENERATOR")
     private Long id;
 
     @Column(name = "NAME")
