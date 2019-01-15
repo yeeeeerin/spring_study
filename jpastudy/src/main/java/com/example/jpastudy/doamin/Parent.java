@@ -20,7 +20,7 @@ public class Parent {
     @Column
     String name;
 
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
-    private List<Child> children = new ArrayList<Child>();
+    //@OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    //private List<Child> children = new ArrayList<Child>();
 
 }

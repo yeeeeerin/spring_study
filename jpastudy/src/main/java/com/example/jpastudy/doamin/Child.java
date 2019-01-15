@@ -17,6 +17,6 @@ public class Child {
     @Column
     String name;
 
-    @ManyToOne
-    private Parent parent;
+    //@ManyToOne
+    //private Parent parent;
 }

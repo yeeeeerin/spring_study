@@ -42,6 +42,7 @@ public class JpastudyApplicationTests {
 
     }
 
+    /*
     @Test
     public void cascadeTest(){
 
@@ -67,6 +68,7 @@ public class JpastudyApplicationTests {
         assertThat(children.size(),is(0));
 
     }
+    */
 
     @Test
     public void eagerloding(){
