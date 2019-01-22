@@ -13,6 +13,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
@@ -118,6 +121,36 @@ public class JpastudyApplicationTests {
         Team team1 = teamRepository.findById(1l).get();
 
         //assertThat(team1.getMembers().size(),is(4));
+
+    }
+
+    @Test
+    public void pageTest(){
+
+
+        for(int i=0;i<46;i++){
+            Child child = new Child("김"+i);
+            childRepository.save(child);
+        }
+
+
+        PageRequest pageRequest
+                = new PageRequest(0,10,new Sort(Sort.Direction.DESC,"name"));
+
+        Page<Child> result = childRepository.findByNameStartingWith("김",pageRequest);
+
+        List<Child> children = result.getContent();
+        int totalPages = result.getTotalPages();
+        boolean hasNextPage = result.hasNext();
+        boolean hasPrePage = result.hasPrevious();
+
+        assertThat(totalPages,is(5));
+        assertThat(hasNextPage,is(true));
+        assertThat(hasPrePage,is(false));
+
+
+        childRepository.deleteAll();
+
 
     }
 

@@ -17,7 +17,7 @@ public class AsyncConfig {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(5);
         executor.setMaxPoolSize(10);
-        executor.setQueueCapacity(10000);
+        executor.setQueueCapacity(1000);
         executor.setThreadNamePrefix("entityInsert-");
         executor.initialize();
         return executor;
