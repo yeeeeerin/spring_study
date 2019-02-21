@@ -8,6 +8,7 @@ import com.example.jpastudy.repository.ChildRepository;
 import com.example.jpastudy.repository.MemberRepository;
 import com.example.jpastudy.repository.ParentRepository;
 import com.example.jpastudy.repository.TeamRepository;
+import com.example.jpastudy.service.ChildService;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,12 +39,35 @@ public class JpastudyApplicationTests {
     @Autowired
     ChildRepository childRepository;
 
+    @Autowired
+    ChildService childService;
+
     //@After
     public void afterDeleteData(){
         memberRepository.deleteAll();
         teamRepository.deleteAll();
 
     }
+
+    @Test
+    public void lazyTest(){
+        Parent parent = new Parent();
+        parent.setName("ii");
+
+        Child child = new Child();
+        child.setName("kk");
+        child.setParent(parent);
+        parentRepository.save(parent);
+        childService.saveCilde(child);
+
+        //Child child1 = childRepository.findById(child.getId()).get();
+        //Parent parent1 = child1.getParent();
+
+        //assertThat(parent1.getName(),is("ii"));
+
+
+    }
+
 
     /*
     @Test
@@ -72,6 +96,7 @@ public class JpastudyApplicationTests {
 
     }
     */
+
 
     @Test
     public void eagerloding(){

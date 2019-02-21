@@ -39,6 +39,11 @@ public class Chapter1ApplicationTests {
     private User user2;
     private User user3;
 
+    @Test
+    public void contextLoad(){
+
+    }
+
 
 
     @Before

@@ -4,7 +4,9 @@ import com.example.chapter1.dao.DaoFactory;
 import com.example.chapter1.domain.User;
 import com.example.chapter1.dao.UserDao;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

@@ -23,6 +23,6 @@ public class Child {
     @Column
     String name;
 
-    //@ManyToOne
-    //private Parent parent;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Parent parent;
 }

@@ -1,4 +1,4 @@
-package com.example.chapter1.dao;
+package com.example.chapter1.dao.notuse;
 
 import com.example.chapter1.domain.User;
 
