@@ -16,10 +16,13 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.springframework.aop.framework.ProxyFactoryBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.mail.MailSender;
 import org.springframework.mail.SimpleMailMessage;
+import org.springframework.stereotype.Component;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -33,6 +36,7 @@ import java.util.List;
 import static com.example.chapter1.service.UserServiceImpl.MIN_LOGCOUNT_FOR_SILVER;
 import static com.example.chapter1.service.UserServiceImpl.MIN_RECCOMEND_FOR_GOLD;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.theInstance;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -41,6 +45,7 @@ import static org.mockito.Mockito.*;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserServiceTest {
+
 
     @Autowired
     UserService userService;
@@ -52,16 +57,24 @@ public class UserServiceTest {
     PlatformTransactionManager transactionManager;
     @Autowired
     MailSender mailSender;
-    @Autowired
-    UserServiceImpl userServiceImpl;
+    //@Autowired
+    //UserServiceImpl userServiceImpl;
     //팩토리 빈을 가져오려면 애플리케이션 컨텍스트가 필요하다.
     @Autowired
     ApplicationContext context;
+
+    TestUserServiceImpl testUserService;
+
 
     List<User> users;
 
     @Before
     public void serUp(){
+
+        testUserService = new TestUserServiceImpl();
+        testUserService.setUserDao(this.dao);
+        testUserService.setMailSender(mailSender);
+
         users = Arrays.asList(
                 new User("aaa","aaa","aaa", Level.BASIC,MIN_LOGCOUNT_FOR_SILVER-1,0,"aa@aa.aa"),
                 new User("bbb","bbb","bbb", Level.BASIC,MIN_LOGCOUNT_FOR_SILVER,0,"bb@bb.bb"),
@@ -90,22 +103,14 @@ public class UserServiceTest {
     }
 
     @Test
-    @DirtiesContext //컨텍스트 무효화 애노테이션
     public void upgradeAllOrNothing() throws Exception {
-        TestUserService testUserService = new TestUserService(users.get(3).getId());
-        testUserService.setUserDao(this.dao);
-        testUserService.setMailSender(mailSender);
-
-        ProxyFactoryBean txProxyFactoryBean = context.getBean("&userService",ProxyFactoryBean.class);
-        txProxyFactoryBean.setTarget(testUserService);
-        UserService txUserService = (UserService)txProxyFactoryBean.getObject();
 
         dao.deleteAll();
         for(User user:users) dao.add(user);
 
         try {
             //트랜잭션 기능을 분리한 오브젝트를 통해 예외 발생용 TestUserService가 호출되게 해야한다.
-            txUserService.upgradeLevels();
+            this.userService.upgradeLevels();
             fail("TestUserServiceException expected");
         }catch (TestUserServiceException e){
 
@@ -193,16 +198,13 @@ public class UserServiceTest {
         }
     }
 
-    static class TestUserService extends UserServiceImpl{
-        private String id;
 
-        /*
-        예외를 발생시킬 User 오브젝트의 id를 지정할 수 있게 만든다.
-         */
-        private TestUserService(String id){
-            this.id = id;
+    static class TestUserServiceImpl extends UserServiceImpl{
+        private String id = "ccc";
+
+        public TestUserServiceImpl(){
+
         }
-
         /*
         지정된 id의 User 오브젝트가 발견되면 예외를 던져서 작업을 강제로 중단시킨다.
          */

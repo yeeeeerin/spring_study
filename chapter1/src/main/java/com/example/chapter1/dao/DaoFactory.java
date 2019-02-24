@@ -2,10 +2,12 @@ package com.example.chapter1.dao;
 
 import com.example.chapter1.domain.ConnectionMaker;
 import com.example.chapter1.domain.MConnectionMaker;
+import com.example.chapter1.proxy.NameMatchClassMethodPointcut;
 import com.example.chapter1.service.*;
 import org.springframework.aop.framework.ProxyFactoryBean;
+import org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator;
 import org.springframework.aop.support.DefaultPointcutAdvisor;
-import org.springframework.aop.support.NameMatchMethodPointcut;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
@@ -26,21 +28,28 @@ public class DaoFactory {
         return userDao;
     }
 
+
     @Bean
-    public ProxyFactoryBean userService(){
-        ProxyFactoryBean userService = new ProxyFactoryBean();
-        userService.setTarget(userServiceImpl());
-        userService.setInterceptorNames(new String[]{"transactionAdvisor"});
-        return userService;
+    public DefaultAdvisorAutoProxyCreator defaultAdvisorAutoProxyCreator(){
+        return new DefaultAdvisorAutoProxyCreator();
     }
 
     @Bean
-    public UserServiceImpl userServiceImpl(){
+    public NameMatchClassMethodPointcut transactionPointcut(){
+        NameMatchClassMethodPointcut nameMatchMethodPointcut = new NameMatchClassMethodPointcut();
+        nameMatchMethodPointcut.setMappedClassName("*ServiceImpl");
+        nameMatchMethodPointcut.setMappedName("upgrade*");
+        return nameMatchMethodPointcut;
+    }
+
+    @Bean
+    public UserServiceImpl userService(){
         UserServiceImpl userService = new UserServiceImpl();
         userService.setUserDao(userDao());
         userService.setMailSender(mailSender());
         return userService;
     }
+
 
     @Bean
     public DataSourceTransactionManager transactionManager(){
@@ -84,13 +93,6 @@ public class DaoFactory {
 
 
     @Bean
-    public NameMatchMethodPointcut transactionPointcut(){
-        NameMatchMethodPointcut nameMatchMethodPointcut = new NameMatchMethodPointcut();
-        nameMatchMethodPointcut.setMappedName("upgrade*");
-        return nameMatchMethodPointcut;
-    }
-
-    @Bean
     public DefaultPointcutAdvisor transactionAdvisor(){
         DefaultPointcutAdvisor defaultPointcutAdvisor = new DefaultPointcutAdvisor();
         defaultPointcutAdvisor.setAdvice(transactionAdvice());
@@ -103,4 +105,7 @@ public class DaoFactory {
     public ConnectionMaker connectionMaker(){
         return new MConnectionMaker();
     }
+
+
+
 }
